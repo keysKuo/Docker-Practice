@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ezt_frontend
+    ports:
+      - "5000:5000"
+    networks:
+      - ezt-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ezt_backend
+    ports:
+      - "2405:2405"
+    networks:
+      - ezt-network
+    volumes:
+      - ./backend/public:/backend/public
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - ezt-network
+
+networks:
+  ezt-network:
+    driver: bridge
